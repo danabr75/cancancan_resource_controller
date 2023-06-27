@@ -73,5 +73,5 @@ Currently we do not instantiate the nested assocations to run permission checks 
 When updating a parent object, and at the same time creating a nested assocation, the action that would be checked for both parent and nested object would the be the :update action. Ideally, we would use the :create action for that assocation. This is also due to us not currently trying to instantiate nested associations
 
 # Warning:
-Leaving off the permitted_attributes parameter entirely will allow ALL attributes AND associations to be passed through.
-can :update, User#, [will allow all attribs and associations]
+Leaving off the permitted_attributes parameter entirely will allow ALL attributes AND associations to be passed through.  
+`can :update, User#, [will allow all attribs and associations]`
