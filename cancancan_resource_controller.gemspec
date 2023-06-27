@@ -1,4 +1,4 @@
-# gem build rails_json_serializer.gemspec
+# gem build cancancan_resource_controller.gemspec
 
 Gem::Specification.new do |s|
   s.name = %q{cancancan_resource_controller}
@@ -12,10 +12,9 @@ Gem::Specification.new do |s|
     "lib/cancancan/abstract_resource_controller.rb",
   ]
   s.require_paths = ["lib"]
-  s.homepage = 'https://github.com/danabr75/rails_json_serializer'
-  s.add_runtime_dependency 'rails', '>= 5.0'
-  s.add_runtime_dependency 'zlib', '>= 1.0'
-  s.add_development_dependency 'rails', ['~> 5.0']
+  s.homepage = 'https://github.com/danabr75/cancancan_resource_controller'
+  s.add_runtime_dependency 'cancancan', ['~> 3.5.0', '>= 3.5.0']
+  s.add_development_dependency 'rails', ['6.1.7.3']
   s.add_development_dependency "rspec", ["~> 3.9"]
   s.add_development_dependency "listen", ["~> 3.2"]
   s.add_development_dependency "rspec-rails", ["~> 4.0"]
