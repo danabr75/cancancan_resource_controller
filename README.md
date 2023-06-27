@@ -44,10 +44,12 @@ class Ability
 
   def initialize(user = nil)
     # Nested Attribs
+
     # METHOD 1 (attrib)
     # - `association_name + '_attributes'`
     # - :vehicles_attributes will be used to permit it's usage in your controller
     can :update, User, [:first_name, :last_name, :vehicles_attributes]
+
     # METHOD 2 (action)
     # - `'_can_add_or_remove_association_' + association_name`
     # - same result as Method 1, alternate approach.
@@ -55,9 +57,11 @@ class Ability
     can :_can_update_association_vehicles, User
 
     # Add/Remove IDs from has_many assocation
+
     # METHOD 1 (attrib):
     # - `association_name.singularize + '_ids'`
     can :update, Vehicle, [:make, :model, :part_ids]
+
     # METHOD 2 (action)
     # - `'_can_add_or_remove_association_' + association_name`
     can :_can_add_or_remove_association_parts, Vehicle
