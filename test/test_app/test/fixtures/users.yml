@@ -1,0 +1,13 @@
+---
+users_001:
+  id: 1
+  email: "test@test.test"
+  first_name: "Ben"
+  last_name: "Dana"
+  role: "staff"
+users_002:
+  id: 2
+  email: "test2@test.test"
+  first_name: "Victor"
+  last_name: "Frankenstein"
+  role: 
