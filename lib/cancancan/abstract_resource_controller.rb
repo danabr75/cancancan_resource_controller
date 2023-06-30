@@ -189,7 +189,6 @@ module CanCanCan
       @resource ||= @resource_class.find(params[:id])
       authorize! :destroy, @resource
       # retuning the resource in a pre-destroyed state as a destroy response
-      results = @resource
       if @resource.destroy
         respond_after_destroy
       else
@@ -237,7 +236,7 @@ module CanCanCan
     def respond_after_destroy
       respond_to do |format|
         format.html { redirect_to url_for(controller: controller_name, action: 'index') }
-        format.json { render json: results, status: :no_content }
+        format.json { render json: @resource, status: :no_content }
       end
     end
 
