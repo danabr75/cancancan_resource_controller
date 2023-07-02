@@ -13,8 +13,8 @@ class UsersController < ActionController::Base
   # `@resource ||= @resource_class.find(params[:id])`
   # if you need to locate the object yourself, or apply additional logic, you can use a `before_action` hook.
 
-  # almost all methods will return a @resource object
-  # :index returns a @resources object
+  # almost all methods will render a @resource object
+  # - :index renders a @resources object
   # i.e.:
   # respond_to do |format|
   #   format.html # Renders the default
