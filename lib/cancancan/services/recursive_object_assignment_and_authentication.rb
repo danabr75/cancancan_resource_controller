@@ -120,14 +120,6 @@ class RecursiveRecordAssignmentAndAuthentication
       assoc_primary_key
     ] + assoc_klass.nested_attributes_options.keys.collect{ |v| "#{v}_attributes".to_sym }
 
-    # if attribs[assoc_primary_key].present?
-    #   puts "CASE 1: #{assoc_primary_key} and #{attribs[assoc_primary_key]}"
-    #   child = parent.send(nested_attrib_key).where(assoc_primary_key => attribs[assoc_primary_key]).first
-    # else
-    #   puts "CASE 2"
-    #   child = parent.send(nested_attrib_key).build
-    # end
-
     # Had issues with nested records on other root objects not being able to be updated to be nested under this root object
     if attribs[assoc_primary_key].present?
       child = assoc_klass.where(assoc_primary_key => attribs[assoc_primary_key]).first
