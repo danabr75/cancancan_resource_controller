@@ -11,3 +11,9 @@ users_002:
   first_name: "Victor"
   last_name: "Frankenstein"
   role: 
+users_003:
+  id: 3
+  email: "test3@test.test"
+  first_name: "Vic"
+  last_name: "Franky"
+  role: 'creative'

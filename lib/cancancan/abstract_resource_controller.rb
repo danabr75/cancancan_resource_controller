@@ -102,8 +102,6 @@ module CanCanCan
     def new
       authorize! :create, @resource_class
       @resource ||= @resource_class.new(resource_params)
-      # 2nd auth on the object itself
-      #   Not authing on the nested resources, that could have come in as nested attributes.
       authorize! :create, @resource
 
       respond_with_resource
@@ -125,17 +123,16 @@ module CanCanCan
 
     def create
       authorize! :create, @resource_class
-      # @resource = @resource_class.new(resource_params)
+      @resource ||= @resource_class.new
 
-      # This 2nd @resource initiation is so we run run whitelisting attribs on the object.
-      #   Class whitelisting is far more broad than object attrib whitelisting.
-      #   Necessary if class permissions have a permissions-block.
-      @resource ||= @resource_class.new(resource_params(@resource))
+      service = RecursiveRecordAssignmentAndAuthentication.new(
+        current_ability,
+        action_name,
+        @resource,
+        resource_params(@resource)
+      )
 
-      # 2nd auth on the object itself
-      authorize! :create, @resource
-
-      if @resource.save
+      if service.call
         respond_with_resource
       else
         begin
@@ -152,25 +149,14 @@ module CanCanCan
     def update
       authorize! :update, @resource_class
       @resource ||= @resource_class.find(params[:id])
-      authorize! :update, @resource
+      service = RecursiveRecordAssignmentAndAuthentication.new(
+        current_ability,
+        action_name,
+        @resource,
+        resource_params(@resource)
+      )
 
-      second_authorize = false
-      ActiveRecord::Base.transaction do
-        @resource.assign_attributes(resource_params(@resource))
-        second_authorize = can?(action_name.to_sym, @resource)
-        unless second_authorize
-          # NOTE: Does not halt the controller process, just rolls back the DB
-          raise ActiveRecord::Rollback
-        end
-      end
-
-      unless second_authorize
-        raise CanCan::AccessDenied.new("Not authorized!", action_name.to_sym, @resource)
-      end
-
-      # 2nd auth, on the updates of the object, without saving, so we can rollback without auth.
-      # authorize! :update, @resource
-      if @resource.save
+      if service.call
         respond_with_resource
       else
         begin

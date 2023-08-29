@@ -5,21 +5,14 @@ ActiveRecord::Schema.define(version: 2020_05_08_150547) do
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
 
-  create_table "users", id: :serial, force: :cascade do |t|
+  create_table "users", id: :integer, force: :cascade do |t|
     t.string "email"
     t.string "first_name"
     t.string "last_name"
     t.string "role"
   end
 
-  create_table "users", id: :serial, force: :cascade do |t|
-    t.string "email"
-    t.string "first_name"
-    t.string "last_name"
-    t.string "role"
-  end
-
-  create_table "groups", id: :serial, force: :cascade do |t|
+  create_table "groups", id: :integer, force: :cascade do |t|
     t.string "name"
   end
 
@@ -28,14 +21,14 @@ ActiveRecord::Schema.define(version: 2020_05_08_150547) do
     t.bigint "group_id"
   end
 
-  create_table "vehicles", id: :serial, force: :cascade do |t|
+  create_table "vehicles", id: :integer, force: :cascade do |t|
     t.string "make"
     t.string "model"
     t.bigint "user_id"
     t.string "type"
   end
 
-  create_table "parts", id: :serial, force: :cascade do |t|
+  create_table "parts", id: :integer, force: :cascade do |t|
     t.string "name"
     t.bigint "partable_id"
     t.string "partable_type"
@@ -47,7 +40,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_150547) do
     t.bigint "part_id"
   end
 
-  create_table "brands", id: :serial, force: :cascade do |t|
+  create_table "brands", id: :integer, force: :cascade do |t|
     t.string "name"
   end
 end

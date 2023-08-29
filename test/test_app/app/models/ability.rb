@@ -13,5 +13,12 @@ class Ability
       can :update, Part, [:id, :name]
       can :_can_add_or_remove_association_brands, Part
     end
+
+    # test case where we only allow creates
+    if user&.role == 'creative'
+      can :create, User, [:first_name, :last_name, :vehicles_attributes, :group_ids, :email]
+      can :create, Vehicle
+      can :create, Part, [:id, :name, :brand_ids]
+    end
   end
 end
