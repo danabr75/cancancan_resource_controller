@@ -1,5 +1,4 @@
 require_relative 'cancancan/configuration'
-require_relative 'cancancan/services/recursive_object_assignment_and_authentication'
 require_relative 'cancancan/abstract_resource_controller'
 require_relative 'cancancan/version'
 

@@ -154,7 +154,7 @@ RSpec.describe UsersController, type: :controller do
         }],
       }
 
-      CanCanCan::AbstractResourceController.configure do |config|
+      CanCanCan::NestedAssignmentAndAuthorization.configure do |config|
         config.silence_raised_errors = true
       end
       response = post(:update, params: params, as: :json)
@@ -303,7 +303,7 @@ RSpec.describe UsersController, type: :controller do
         }],
       }
 
-      CanCanCan::AbstractResourceController.configure do |config|
+      CanCanCan::NestedAssignmentAndAuthorization.configure do |config|
         config.use_smart_nested_authorizations = false
       end
 
@@ -394,7 +394,7 @@ RSpec.describe UsersController, type: :controller do
         }],
       }
 
-      CanCanCan::AbstractResourceController.configure do |config|
+      CanCanCan::NestedAssignmentAndAuthorization.configure do |config|
         config.silence_raised_errors = true
       end
 
@@ -439,7 +439,7 @@ RSpec.describe UsersController, type: :controller do
         ],
       }
 
-      CanCanCan::AbstractResourceController.configure do |config|
+      CanCanCan::NestedAssignmentAndAuthorization.configure do |config|
         config.use_smart_nested_authorizations = true
       end
 

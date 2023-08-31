@@ -1,3 +1,4 @@
+require 'cancancan_nested_assignment_and_authorization'
 # How to utilize CanCan Permissions to work with this controller:
 module CanCanCan
   module AbstractResourceController
@@ -10,14 +11,6 @@ module CanCanCan
     # Used to stop infinite recursive on associations (could just be deeply nested structures. Could also be self-referencing).
     MAX_ASSOCIATIVE_NESTED_DEPTH = 60
     REGEX_FOR_HTML_TAG_DETECTION = /.*\<\/?[^_\W]+\>.*/
-
-    # to handle adding/removing associations by "_ids" suffix
-    IDS_ATTIB_PERMISSION_KEY_GEN = Proc.new { |assoc_key| "#{assoc_key.to_s.singularize}_ids".to_sym }
-    IDS_ACTION_PERMISSION_KEY_GEN = Proc.new { |assoc_key| "_can_add_or_remove_association_#{assoc_key.to_s}".to_sym }
-
-    # to handle updating nested attributes
-    NESTED_ATTIB_PERMISSION_KEY_GEN = Proc.new { |assoc_key| "#{assoc_key.to_s}_attributes".to_sym }
-    NESTED_ACTION_PERMISSION_KEY_GEN  = Proc.new { |assoc_key| "_can_update_association_#{assoc_key.to_s}".to_sym }
 
     # For Read-Only fields
     #  - define this on your class model
@@ -95,7 +88,7 @@ module CanCanCan
       # Allow @resource to be set from subclass controller
       @resource ||= @resource_class.find(params[:id])
       authorize! :show, @resource
-      
+
       respond_with_resource
     end
 
@@ -125,11 +118,11 @@ module CanCanCan
       authorize! :create, @resource_class
       @resource ||= @resource_class.new
 
-      service = RecursiveRecordAssignmentAndAuthentication.new(
+      service = CanCanCan::AssignmentAndAuthorization.new(
         current_ability,
         action_name,
         @resource,
-        resource_params(@resource)
+        clean_parameter_data(params)
       )
 
       if service.call
@@ -149,11 +142,11 @@ module CanCanCan
     def update
       authorize! :update, @resource_class
       @resource ||= @resource_class.find(params[:id])
-      service = RecursiveRecordAssignmentAndAuthentication.new(
+      service = CanCanCan::AssignmentAndAuthorization.new(
         current_ability,
         action_name,
         @resource,
-        resource_params(@resource)
+        clean_parameter_data(params)
       )
 
       if service.call
@@ -231,36 +224,6 @@ module CanCanCan
       return resource_query
     end
 
-    # can pass in custom method to supplant 'param.permit', like if you wanted to whitelist a hash instead of params.
-    # ex: CanCanCanResourceController#deactivate_helper, permits on fake params: ActionController::Parameters.new(deactive_params)
-    def resource_params resource_object = nil, opts = {}, &block
-      local_action_name = opts[:custom_action_name] || action_name
-      allowlist_permitted = get_nested_attributes_for_class(@resource_class, local_action_name.to_sym, resource_object)
-
-      # # Rails kludge, issue with allowing parameters with empty arrays
-      # # Needs to be nested, recursive
-      # # Updating params in-place
-      # params.each do |key, value|
-      #   if key.to_s =~ /(.*)_ids/ && (value == "remove" || value == ["remove"])
-      #     params[key] = []
-      #   end
-      # end
-
-      if block_given?
-        params_with_only_allowed_parameters = yield(allowlist_permitted)
-      else
-        params_with_only_allowed_parameters = param_permit(allowlist_permitted)
-      end
-
-      # sanitize all input.
-      sanitized_params_with_only_allowed_parameters = clean_parameter_data(params_with_only_allowed_parameters)
-
-      # recast type (and have to re-permit)
-      sanitized_params_with_only_allowed_parameters = ActionController::Parameters.new(sanitized_params_with_only_allowed_parameters).permit(allowlist_permitted)
-
-      return sanitized_params_with_only_allowed_parameters
-    end
-
     # recursive
     # src: https://apidock.com/rails/v5.2.3/ActionView/Helpers/SanitizeHelper/sanitize
     def clean_parameter_data param_value
@@ -295,86 +258,6 @@ module CanCanCan
         end
         return new_hash
       end
-    end
-
-    # Not checking instances of classes. What if they are object-state dependent?
-    # Need to run them again, after object instantiation, but in a different method.
-    def get_nested_attributes_for_class resource_class, action_name, root_level_object, depth = 0
-      raise "invalid action class: #{action_name.class}" if !action_name.is_a?(Symbol)
-      association_parameters = []
-      if depth > MAX_ASSOCIATIVE_NESTED_DEPTH
-        return association_parameters
-      end
-
-      # Handle resource_class attribs
-      # issue here is the 'action_name' on the root 'resource_class' may not be the action that the user has for the 'assoc_class'
-      # i.e:
-      #   We may want the user to update Account, and create attachments on it, but not 'update' attachments.
-      if depth == 0
-        association_parameters = current_ability.permitted_attributes(action_name, (root_level_object || resource_class)) 
-      else
-        association_parameters = current_ability.permitted_attributes(action_name, resource_class)
-      end
-
-      if resource_class.const_defined?('RESOURCE_CONTROLLER_ATTRIB_ALLOWLIST') && !resource_class::RESOURCE_CONTROLLER_ATTRIB_ALLOWLIST.nil?
-        association_parameters &= resource_class::RESOURCE_CONTROLLER_ATTRIB_ALLOWLIST
-      end
-
-      # remove customized, non-params, assoc' attrib data by only allowing class columns
-      association_parameters &= resource_class.column_names.collect(&:to_sym)
-
-      resource_class.reflect_on_all_associations(:has_many).each do |assoc_class|
-        resource_key = assoc_class.name
-        # attrib_permission_key = (resource_key.to_s.singularize + '_ids').to_sym
-        attrib_permission_key = IDS_ATTIB_PERMISSION_KEY_GEN.call(resource_key)
-        # action_permission_key = ('_can_add_or_remove_association_' + resource_key.to_s).to_sym
-        action_permission_key = IDS_ACTION_PERMISSION_KEY_GEN.call(resource_key)
-        # i.e. can?(:can_participation_ids, Account)
-        # Check to see if we manually gave the user a custom permission
-        # # (i.e.: can [:update, :can_account_sector_ids], Account)
-        # OR
-        # see if it has the attribute on the class's allowed params
-        if can?(action_permission_key, resource_class) || can?(action_name, resource_class, attrib_permission_key)
-          association_parameters << {
-            attrib_permission_key => []
-          }
-        end
-      end
-
-      resource_class.nested_attributes_options.each do |resource_key, options|
-        reflection_class = resource_class.reflect_on_association(resource_key).class
-        reflection_type  = reflection_class.name
-        assoc_class = resource_class.reflect_on_association(resource_key).klass
-
-        if [
-          "ActiveRecord::Reflection::BelongsToReflection",
-          "ActiveRecord::Reflection::HasOneReflection",
-          "ActiveRecord::Reflection::HasManyReflection"
-        ].include?(reflection_type)
-          parameter_key = NESTED_ATTIB_PERMISSION_KEY_GEN.call(resource_key)
-          permission_key = NESTED_ACTION_PERMISSION_KEY_GEN.call(resource_key)
-
-          # Can check if permission to update assoc is defined as an action OR as an attrib on the parent resource_class
-          if can?(permission_key, resource_class) || can?(action_name, resource_class, parameter_key)
-            # Handle recursion
-            assoc_parameters = get_nested_attributes_for_class(assoc_class, action_name, root_level_object, depth + 1)
-
-            if options[:allow_destroy] && can?(:destroy, resource_class)
-              assoc_parameters << :_destroy
-            end
-
-            association_parameters << {
-              parameter_key => assoc_parameters
-            }
-          end
-        end
-      end
-
-      return association_parameters
-    end
-
-    def param_permit base_parameters
-      params.permit(base_parameters)
     end
 
     def initialize_resource_class

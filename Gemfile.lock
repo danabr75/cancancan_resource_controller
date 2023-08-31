@@ -62,6 +62,8 @@ GEM
       zeitwerk (~> 2.3)
     builder (3.2.4)
     cancancan (3.5.0)
+    cancancan_nested_auth (0.0.0)
+      cancancan (~> 3.5.0, >= 3.5.0)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
     daemons (1.4.1)
@@ -184,6 +186,7 @@ PLATFORMS
 
 DEPENDENCIES
   cancancan (~> 3.5.0, >= 3.5.0)
+  cancancan_nested_auth
   database_cleaner (~> 1.8)
   listen
   rails (= 6.1.7.3)

@@ -1,13 +1,18 @@
 # Use CanCan's :permitted_attributes method to automatically determine controller permitted parameters.
 CanCan provides a way to set permitted attributes, so why build something else?
 
+# Install (add to Gemfile)
+```
+gem 'cancancan_resource_controller', '~> 1'
+```
+
 # Usage:
 (Optional) create init file: config/initializers/cancancan_resource_controller.rb and populate it with the following:
 
 ```
 require "cancancan_resource_controller"
 # default values shown
-CanCanCan::AbstractResourceController.configure do |config|
+CanCanCan::NestedAssignmentAndAuthorization.configure do |config|
   # Allows for stopping unauthorized actions without raising errors
   # - Will let root object (and valid, other nested objects) save, even if an invalid nested object exists, if true
   config.silence_raised_errors = false
