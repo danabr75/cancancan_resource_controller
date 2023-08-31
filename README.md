@@ -67,38 +67,13 @@ class Ability
 
   def initialize(user = nil)
     # Nested Attribs
-
-    # METHOD 1 (attrib)
     # - `association_name + '_attributes'`
     # - :vehicles_attributes will be used to permit it's usage in your controller
     can :update, User, [:first_name, :last_name, :vehicles_attributes]
 
-    # METHOD 2 (action)
-    # - `'_can_add_or_remove_association_' + association_name`
-    # - same result as Method 1, alternate approach.
-    # - useful if you aren't interested in spelling out all your permitted_attributes.
-    can :_can_update_association_vehicles, User
-
     # Add/Remove IDs from has_many assocation
-
-    # METHOD 1 (attrib):
-    # - `association_name.singularize + '_ids'`
+    # - part_ids
     can :update, Vehicle, [:make, :model, :part_ids]
-
-    # METHOD 2 (action)
-    # - `'_can_add_or_remove_association_' + association_name`
-    can :_can_add_or_remove_association_parts, Vehicle
   end
 end
 ```
-
-
-# Shortcoming A:
-Currently we do not instantiate the nested assocations to run permission checks at the object level. We only run class checks on associations. We run instance level checks only on the root object.
-
-# Shortcoming B:
-When updating a parent object, and at the same time creating a nested assocation, the action that would be checked for both parent and nested object would the be the :update action. Ideally, we would use the :create action for that assocation. This is also due to us not currently trying to instantiate nested associations
-
-# Warning:
-Leaving off the permitted_attributes parameter entirely will allow ALL attributes AND associations to be passed through.  
-`can :update, User#, [will allow all attribs and associations]`
