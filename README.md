@@ -1,6 +1,11 @@
 # Use CanCan's :permitted_attributes method to automatically determine controller permitted parameters.
 CanCan provides a way to set permitted attributes, so why build something else?
 
+# Install (add to Gemfile)
+```
+gem 'cancancan_resource_controller', '~> 1'
+```
+
 # Usage:
 (Optional) create init file: config/initializers/cancancan_resource_controller.rb and populate it with the following:
 
