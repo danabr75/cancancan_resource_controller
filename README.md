@@ -77,3 +77,21 @@ class Ability
   end
 end
 ```
+
+# Implementing Pagination on :index example
+```
+class UsersController < ActionController::Base
+  include CanCanCan::AbstractResourceController
+
+  protected
+
+  # Use a gem or implement manually, like so
+  def respond_with_resources
+    page     = params[:page]&.to_i || 1
+    per_page = params[:per_page]&.to_i || 10
+    offset   = per_page * (page - 1)
+    @resources = @resources.limit(per_page).offset(offset)
+    super
+  end
+end
+```
