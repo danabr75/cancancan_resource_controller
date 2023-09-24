@@ -78,7 +78,7 @@ class Ability
 end
 ```
 
-# Implementing Pagination on :index example
+# Implementing Pagination on :index
 ```
 class UsersController < ActionController::Base
   include CanCanCan::AbstractResourceController
@@ -94,4 +94,13 @@ class UsersController < ActionController::Base
     super
   end
 end
+```
+
+# Implementing search on :index
+```
+  # meant to be overridden by inheriting controllers.
+  # - can be used for searching or whatever
+  def index_resource_query resource_query
+    return resource_query
+  end
 ```
