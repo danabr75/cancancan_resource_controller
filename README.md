@@ -98,9 +98,14 @@ end
 
 # Implementing search on :index
 ```
-  # meant to be overridden by inheriting controllers.
+class UsersController < ActionController::Base
+  include CanCanCan::AbstractResourceController
+
+  protected
+
   # - can be used for searching or whatever
   def index_resource_query resource_query
     return resource_query
   end
+end
 ```
