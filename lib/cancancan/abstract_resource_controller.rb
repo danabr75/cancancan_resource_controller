@@ -105,13 +105,7 @@ module CanCanCan
       @resource ||= @resource_class.find(params[:id])
       authorize! :update, @resource
 
-      respond_to do |format|
-        format.html # Renders the default
-        format.json { render json: @resources }
-        format.xml { render xml: @resources }
-        format.csv # Renders the default
-        format.xlsx # Renders the default
-      end
+      respond_with_resource
     end
 
     def create
