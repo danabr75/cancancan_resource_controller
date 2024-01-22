@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{cancancan_resource_controller}
-  s.version = "1.1.0"
+  s.version = "1.1.1"
   s.date = %q{2023-07-27}
   s.authors = ["benjamin.dana.software.dev@gmail.com"]
   s.summary = %q{A Rails Controller Module that uses CanCan's permitted attribs instead of typical parameter allowlisting.}
