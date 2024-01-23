@@ -96,25 +96,7 @@ module CanCanCan
       authorize! :create, @resource_class
       @resource ||= @resource_class.new
 
-      service = CanCanCan::AssignmentAndAuthorization.new(
-        current_ability,
-        action_name,
-        @resource,
-        clean_parameter_data(params)
-      )
-
-      if service.call
-        respond_with_resource
-      else
-        begin
-          Rails.logger.warn "Failed object validations: could not new #{@resource_class}: #{@resource.errors.full_messages}"
-          respond_with_resource_invalid
-        rescue Exception => e
-          Rails.logger.error "CanCanCanResourceController - Caught Internal Server Error: " + e.class.to_s + ': ' + e.message
-          Rails.logger.error Rails.backtrace_cleaner.clean(e.backtrace).join("\n").to_s
-          respond_with_resource_error
-        end
-      end
+      respond_with_resource
     end
 
     def edit
