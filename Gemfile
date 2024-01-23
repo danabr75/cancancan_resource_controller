@@ -2,7 +2,7 @@
 source 'https://rubygems.org'
 ruby '3.1.2'
 gem 'cancancan', '~> 3.5.0', '>= 3.5.0'
-gem 'cancancan_nested_auth', '>= 0'
+gem 'cancancan_nested_auth', '>= 1.0.0'
 
 # need to test at this level.
 # gem 'zlib', '>= 1.0'
