@@ -225,7 +225,14 @@ module CanCanCan
       if param_value.is_a?(String) && !(param_value =~ REGEX_FOR_HTML_TAG_DETECTION).nil?
         # We need a better way, in the future, to specify the allowed values down to the Class and Column level.
         return ActionController::Base.helpers.sanitize(param_value, {tags: self.class::DEFAULT_PARAMETER_SANITIZER_ALLOWED_TAGS, attributes: self.class::DEFAULT_PARAMETER_SANITIZER_ALLOWED_ATTRIBS})
-      elsif param_value.is_a?(String) || param_value.is_a?(Integer) || param_value.is_a?(Float) || param_value.nil? || [true, false].include?(param_value)
+      elsif (
+        param_value.is_a?(String) ||
+        param_value.is_a?(Integer) ||
+        param_value.is_a?(Float) ||
+        param_value.nil? ||
+        [true, false].include?(param_value) ||
+        param_value.is_a?(ActionDispatch::Http::UploadedFile)
+      )
         return param_value
       end
 
